@@ -5,6 +5,7 @@ from functools import wraps
 from task_trak import config
 import logging
 from logging.handlers import RotatingFileHandler
+import base64
 
 # schedular imports : library + function
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -14,11 +15,7 @@ from apscheduler.triggers.cron import CronTrigger
 from flask_swagger_ui import get_swaggerui_blueprint
 
 # db imports
-from sqlalchemy import create_engine, func, desc, or_
-from sqlalchemy.orm import sessionmaker
-
-import base64
-
+from pymongo import MongoClient
 import os
 
 # common imports
@@ -67,12 +64,11 @@ if mode == 'PRODUCTION':
 
 mail=Mail(app)
 
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///task_trak/TaskTrak.db'
-import os
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(basedir, 'TaskTrak.db')}"
-
+# Add MongoDB configuration
+def get_db():
+    client = MongoClient(os.environ.get('DATABASE_URL'))
+    db = client.get_default_database()
+    return db
 
 # Allow CORS for all routes
 # CORS(app)
@@ -113,11 +109,7 @@ def verify_access_token(jwt_token):
 
 # common functions and flask filters
 def get_db_session():
-    from task_trak.db.database_setup import (Base as Base)
-    engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-    Base.metadata.bind = engine
-    DBSession = sessionmaker(bind=engine)
-    return DBSession()
+    return get_db()
     
 def login_required(f):
     @wraps(f)
@@ -259,26 +251,24 @@ def system_admin_exists(f):
             from task_trak.common import set_models_attr
 
             db_session = get_db_session()
-            admin_users = db_session.query(StaffMaster).filter(StaffMaster.Type == e_UserType.SysAdm.idx).all()
+            admin_users = list(db_session.find({"Type": e_UserType.SysAdm.idx}))
 
             # If no admin user is there then create one and proceed ahead
             if not admin_users:
-                admin_user = StaffMaster()
-                admin_user.Type = e_UserType.SysAdm.idx
-                admin_user.Code = 'SysAdm'
-                admin_user.Name = 'SysAdm'
-                admin_user.LoginId = 'SysAdm'
-                admin_user.EmailID = 'SysAdm@trimaxinfotech.com'
-                admin_user.Pswd = PasswordHasher().hash('SysAdm@321')
-                admin_user.Mobile = '9408697497'
-                admin_user.BirthDt = date(1947, 8, 15)
-                admin_user.Photo = None
-                admin_user.ResetPswd = False
-                # admin_user = set_models_attr.setCreatedInfo(admin_user, "Device Name")
-                db_session.add(admin_user)
-                db_session.commit()
+                admin_user = {
+                    "Type": e_UserType.SysAdm.idx,
+                    "Code": 'SysAdm',
+                    "Name": 'SysAdm',
+                    "LoginId": 'SysAdm',
+                    "EmailID": 'SysAdm@trimaxinfotech.com',
+                    "Pswd": PasswordHasher().hash('SysAdm@321'),
+                    "Mobile": '9408697497',
+                    "BirthDt": date(1947, 8, 15),
+                    "Photo": None,
+                    "ResetPswd": False
+                }
+                db_session.insert_one(admin_user)
 
-            db_session.close() 
             return f(*args, **kwargs)
 
         except Exception as e:
@@ -293,26 +283,24 @@ def system_admin_exists(f):
 
     return decorated_function
 
-def company_master_exists(f):
+def company_info_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         try:
             from task_trak.db.models.CompanyMaster import CompanyMaster
-
+            
             db_session = get_db_session()
-            company_master = db_session.query(CompanyMaster).first()
-
+            company_master = db_session.find_one({"_id": 1})  # MongoDB syntax
+            
             if company_master is not None:
                 company_info = {
-                    'id': company_master.ID,
-                    'code': encrypt_decrypt.decrypt_data(company_master.Code),
-                    'name': encrypt_decrypt.decrypt_data(company_master.Name),
-                    'logo': f"data:image/jpeg;base64,{base64.b64encode(company_master.Logo).decode('utf-8')}" if company_master.Logo else "",
+                    'id': company_master.get('_id'),
+                    'code': encrypt_decrypt.decrypt_data(company_master.get('Code', '')),
+                    'name': encrypt_decrypt.decrypt_data(company_master.get('Name', '')),
+                    'logo': f"data:image/jpeg;base64,{base64.b64encode(company_master.get('Logo', b'')).decode('utf-8')}" if company_master.get('Logo') else "",
                 }
-                db_session.close()
                 return f(company_info, *args, **kwargs)
             else:
-                db_session.close()
                 return jsonify({"company_info":{"status":"success", "message": "Company's info not found."}}), 404
         except Exception as e:
             app.logger.error(e)
