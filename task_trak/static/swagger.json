@@ -1,0 +1,474 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Task Trak API",
+    "description": "API for TaskTrak application",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000"
+    }
+  ],
+  "paths": {
+    "/signup": {
+      "post": {
+        "summary": "Create a new user",
+        "tags": ["StaffMaster"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserSignup"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "user_added_successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Email already exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "email_already_exists"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Log in user",
+        "tags": ["StaffMaster"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLogin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User logged in successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "session": {
+                      "type": "object",
+                      "properties": {
+                        "user_type": {
+                          "type": "integer"
+                        },
+                        "user_name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Password mismatch or account not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "password_missmatched"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logout": {
+      "get": {
+        "summary": "Log out user",
+        "tags": ["StaffMaster"],
+        "responses": {
+          "200": {
+            "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "success"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{uid}": {
+      "get": {
+        "summary": "Get user by ID",
+        "tags": ["StaffMaster"],
+        "parameters": [
+          {
+            "name": "uid",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/list_staff": {
+      "get": {
+        "summary": "List all staff members",
+        "tags": ["StaffMaster"],
+        "responses": {
+          "200": {
+            "description": "List of staff members retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetails"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/add_company_info": {
+      "post": {
+        "summary": "Add company information",
+        "tags": ["CompanyMaster"],
+        "description": "This endpoint is used to add new company information.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company information added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/company_info": {
+      "get": {
+        "summary": "Get company information",
+        "tags": ["CompanyMaster"],
+        "description": "This endpoint retrieves the current company information.",
+        "responses": {
+          "200": {
+            "description": "Company information retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyInfo"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Edit company information",
+        "tags": ["CompanyMaster"],
+        "description": "This endpoint is used to edit existing company information.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanyInfo"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Company information updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyInfo"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UserSignup": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "IsActive": {
+            "type": "boolean"
+          },
+          "Type": {
+            "type": "integer"
+          },
+          "LoginId": {
+            "type": "string"
+          },
+          "Pswd": {
+            "type": "string"
+          },
+          "Photo": {
+            "type": "string"
+          },
+          "Mobile": {
+            "type": "string"
+          },
+          "EmailID": {
+            "type": "string"
+          },
+          "Addr1": {
+            "type": "string"
+          },
+          "Addr2": {
+            "type": "string"
+          },
+          "Area": {
+            "type": "string"
+          },
+          "City": {
+            "type": "string"
+          },
+          "Pincode": {
+            "type": "string"
+          },
+          "Country": {
+            "type": "string"
+          },
+          "BirthDt": {
+            "type": "string",
+            "format": "date"
+          },
+          "JoinDt": {
+            "type": "string",
+            "format": "date"
+          },
+          "RelvDt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "BldGrp": {
+            "type": "string"
+          },
+          "Gender": {
+            "type": "string"
+          },
+          "AADHARNo": {
+            "type": "string"
+          },
+          "Other1": {
+            "type": "string"
+          },
+          "Other2": {
+            "type": "string"
+          },
+          "CrDtTm": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CrBy": {
+            "type": "string"
+          },
+          "CrFrom": {
+            "type": "string"
+          },
+          "LstUpdDtTm": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "LstUpdBy": {
+            "type": "string"
+          },
+          "LstUpdFrom": {
+            "type": "string"
+          }
+        }
+      },
+      "UserLogin": {
+        "type": "object",
+        "properties": {
+          "LoginId": {
+            "type": "string"
+          },
+          "Pswd": {
+            "type": "string"
+          }
+        }
+      },
+      "UserDetails": {
+        "type": "object",
+        "properties": {
+          "first_name": {
+            "type": "string"
+          },
+          "last_name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "CompanyInfo": {
+        "type": "object",
+        "properties": {
+          "Code": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Logo": {
+            "type": "string"
+          },
+          "Addr1": {
+            "type": "string"
+          },
+          "Addr2": {
+            "type": "string"
+          },
+          "Area": {
+            "type": "string"
+          },
+          "City": {
+            "type": "string"
+          },
+          "Pincode": {
+            "type": "string"
+          },
+          "Country": {
+            "type": "string"
+          },
+          "Phone": {
+            "type": "string"
+          },
+          "Mobile": {
+            "type": "string"
+          },
+          "EMail": {
+            "type": "string",
+            "format": "email"
+          },
+          "WebAddr": {
+            "type": "string"
+          },
+          "Other1": {
+            "type": "string"
+          },
+          "Other2": {
+            "type": "string"
+          },
+          "CrDtTm": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "CrFrom": {
+            "type": "string"
+          },
+          "CrBy": {
+            "type": "string"
+          },
+          "LstUpdDtTm": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "LstUpdBy": {
+            "type": "string"
+          },
+          "LstUpdFrom": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

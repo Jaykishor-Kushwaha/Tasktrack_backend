@@ -1,0 +1,43 @@
+Environment setup biji System ma karvu hoy to su karvu and kaya kaya steps karva
+
+======================
+if error of PyJWT not install then 
+	python -m pip install PyJWT
+
+======================
+Backend Run code	(Open in CMD - without VSCode)
+	Open Project Path
+	D:\Python\TaskTrak-codebasee>
+		cd tasktrack-backend
+		tasktrak_env\Scripts\activate
+
+		-----if any update then Use this code
+		git fetch
+
+		git stash		// for over right exiting code error
+
+		git pull
+		-----
+
+		python -m run
+
+======================
+Fontend Code	(Open in CMD with VSCode)
+	open new cmd	
+	Open Project Path
+	D:\Python\TaskTrak-codebasee>
+		cd task-trak-frontend
+		
+		----For take update open VSCode
+			select Branch => qa and select Round Button
+		----
+		
+		serve -s build
+
+======================
+ # to install 
+Install / Update
+	npm i
+
+To start server
+	npm start

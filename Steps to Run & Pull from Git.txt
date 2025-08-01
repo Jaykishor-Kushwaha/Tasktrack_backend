@@ -1,0 +1,19 @@
+stesp to run tasktrak
+
+go to project dir
+open terminal
+activate virtual environment - <tasktrak_env\Scripts\activate>
+run - <python -m run> from the root of the project dir
+
+
+===========
+cmd
+D:\Python\TaskTrak-codebasee
+tasktrak_env\Scripts\activate
+cd tasktrack-backend
+
+-----if any update then Use this code
+git fetch
+git pull
+-----
+python -m run

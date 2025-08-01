@@ -1,0 +1,15 @@
+__pycache__
+avante_env
+.venv
+avante_task_mgmt/__pycache__
+avante_task_mgmt/db/__pycache__
+*.db
+*.log
+.DS_Store
+*.log.*
+.env
+.idea
+
+# Optional: ignore service account keys
+**/serviceAccount*.json
+**/*-service-acc-key.json

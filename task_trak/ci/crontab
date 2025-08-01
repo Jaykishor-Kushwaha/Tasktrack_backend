@@ -1,0 +1,7 @@
+# cronjob expression for recurring expenses
+#Testing - For local - every 1 minute
+* * * * * cd "/Users/macbookpro/Feelancing Projects/tasktrack-backend/task_trak" && "/Users/macbookpro/Feelancing Projects/tasktrack-backend/.env/bin/flask" generate_task_notifications >> generate_task_notifications_job.log 2>&1
+
+#For production - everyday at 9 in the morning
+#monute hour day(month) month day(week) - format
+0 9 * * * cd ../var/www/html/task_trak && export FLASK_APP=wsgi.py && .env/bin/flask generate_task_notifications >> generate_task_notifications.log 2>&1
