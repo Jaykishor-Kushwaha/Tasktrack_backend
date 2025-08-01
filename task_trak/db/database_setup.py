@@ -1,21 +1,11 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from task_trak import app
+from pymongo import MongoClient
+import os
 
+# MongoDB connection
+def get_database():
+    connection_string = os.environ.get('DATABASE_URL', 'mongodb://localhost:27017/tasktrack')
+    client = MongoClient(connection_string)
+    return client.get_default_database()
 
-Base = declarative_base()
-
-from task_trak.db.models import CompanyMaster
-from task_trak.db.models import StaffMaster
-from task_trak.db.models import UserActivity
-from task_trak.db.models import AttachmentDetails
-from task_trak.db.models import SystemConfig
-from task_trak.db.models import CommunicationCenter
-from task_trak.db.models import ProjectTemplate
-from task_trak.db.models import TaskTemplate
-from task_trak.db.models import SubTaskTemplate
-from task_trak.db.models import ProjectTransaction
-from task_trak.db.models import TaskTransaction
-
-engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
-Base.metadata.create_all(engine)
+# Get database instance
+db = get_database()

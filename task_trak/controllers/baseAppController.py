@@ -1,6 +1,9 @@
 from task_trak import app, company_master_exists, system_admin_exists, login_required
+from task_trak.db.database_setup import db
+from flask import jsonify
 
-from task_trak.db.database_setup import (Base as Base)
+# Remove SQLAlchemy Base import
+# from task_trak.db.database_setup import (Base as Base)
 
 from task_trak.db.models.CompanyMaster import (CompanyMaster as CompanyMaster)
 from task_trak.db.models.StaffMaster import (StaffMaster as StaffMaster)

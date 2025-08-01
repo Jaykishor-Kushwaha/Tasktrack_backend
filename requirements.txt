@@ -8,3 +8,4 @@ PyJWT
 argon2-cffi
 apscheduler
 flask-swagger-ui
+
