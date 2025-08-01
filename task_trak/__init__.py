@@ -603,6 +603,24 @@ def subtask_allocatedby_user_only(f):
 
     return decorated_function
 
+def company_master_exists(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            db_session = get_db_session()
+            company_master = db_session.find_one({"_id": 1})
+            
+            if company_master is not None:
+                return f(*args, **kwargs)
+            else:
+                return jsonify({"status": "error", "message": "Company information not found. Please add company details first."}), 404
+                
+        except Exception as e:
+            app.logger.error(e)
+            return jsonify({"status": "error", "message": "Error checking company information."}), 500
+
+    return decorated_function
+
 # schedular script
 # Initialize APScheduler
 def setup_scheduler():
