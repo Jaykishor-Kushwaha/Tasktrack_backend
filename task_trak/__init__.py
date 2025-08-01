@@ -75,15 +75,18 @@ def get_db():
 # Allow CORS for a specific route
 CORS(app, resources={r"/*": {"origins": "*"}})
 
-def create_access_token(subject, expires_delta=86400):
+def create_access_token(user_data):
+    """Create JWT access token for user"""
     try:
-        expires_delta = datetime.utcnow() + timedelta(seconds=expires_delta)
-        to_encode = {"exp": expires_delta, "sub": str(subject)}
-        encoded_jwt = jwt.encode(
-            to_encode, app.config['JWT_SECRET_KEY'], 'HS256')
-        return encoded_jwt
+        payload = {
+            'sub': str(user_data),
+            'exp': datetime.utcnow() + timedelta(hours=24)
+        }
+        token = jwt.encode(payload, app.config['JWT_SECRET_KEY'], algorithm='HS256')
+        return token
     except Exception as e:
-        return str(e)
+        app.logger.error(f"Error creating access token: {e}")
+        return None
 
 
 # created in order to generate the refresh token when access token expires
